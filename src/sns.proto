@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package csce438;
+
+import "google/protobuf/timestamp.proto";
+
+//----------------- Original SNS Service ------------------------
+
+// The messenger service definition.
+service SNSService {
+
+  rpc Login (Request) returns (Reply) {}
+  rpc List (Request) returns (ListReply) {}
+  rpc Follow (Request) returns (Reply) {}
+  rpc UnFollow (Request) returns (Reply) {}
+  // Bidirectional streaming RPC
+  rpc Timeline (stream Message) returns (stream Message) {}
+
+  rpc CheckServer (Empty) returns (Empty) {}
+  rpc HoldElection (Empty) returns (Empty) {}
+}
+
+message ListReply {
+  repeated string all_users = 1;
+  repeated string followers = 2;
+}
+
+message Request {
+  string username = 1;
+  repeated string arguments = 2;
+}
+
+message Reply {
+  string msg = 1;
+}
+
+message Message {
+  //Username who sent the message
+  string username = 1;
+  //Message from the user
+  string msg = 2;
+  //Time the message was sent
+  google.protobuf.Timestamp timestamp = 3;
+}
+
+//----------------- Routing Service ------------------------
+
+service RoutingService {
+  rpc GetAvailableServer (Empty) returns (ServerId) {}
+  rpc SetAvailableServer (ServerId) returns (Empty) {}
+
+  rpc AddServer (ServerId) returns (Empty) {}
+  rpc RemoveServer (ServerId) returns (Empty) {}
+  rpc GetServerIds (Empty) returns (ServerIds) {}
+}
+
+message Empty {
+
+}
+
+message ServerId {
+    int32 pid = 1;
+    int32 pid_slave = 2;
+    string hostname = 3;
+    string hostname_slave = 4;
+    string port = 5;
+    string port_slave = 6;
+}
+
+message ServerIds {
+    repeated ServerId ids = 1;
+}
